@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Jugaad Roulette — Indian Funny Pitch Spinner</title>
+<meta name="description" content="Spin the wheel, get a ridiculous desi startup idea, build in 5 min, pitch in 60 sec." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css" />
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+</head>
+<body>
+<div class="bg-dots" aria-hidden="true"></div>
+
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <div class="logo">
+      <span class="logo-dice" aria-hidden="true">🎰</span>
+      <div>
+        <div class="logo-title">JUGAAD ROULETTE</div>
+        <div class="logo-sub mono">spin karo bhai • pitch maar</div>
+      </div>
+    </div>
+    <div class="top-actions">
+      <div class="stat-pill mono" title="Total spins">SPINS <b id="statSpins">0</b></div>
+      <div class="stat-pill mono" title="Saved pitches">SAVED <b id="statSaved">0</b></div>
+      <button id="btnMute" class="btn btn-small" aria-label="Mute / unmute sound">🔊 <span id="muteLabel">ON</span></button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="truck-strip" aria-hidden="true">
+    <span class="truck-badge">HORN OK PLEASE</span>
+    <span class="truck-badge alt">USE DIPPER AT NIGHT</span>
+    <span class="truck-badge alt2">PAGAL HAI, PAR GENIUS HAI</span>
+    <span class="truck-badge">100% DESI JUGAAD</span>
+  </div>
+
+  <nav class="stages" aria-label="Game stages">
+    <button class="stage-tab active" data-stage="spin"><span class="stage-num">1</span> SPIN <small>slot + chakra</small></button>
+    <button class="stage-tab" data-stage="build"><span class="stage-num">2</span> BUILD <small>5:00 sprint</small></button>
+    <button class="stage-tab" data-stage="pitch"><span class="stage-num">3</span> PITCH <small>60 sec • bol!</small></button>
+  </nav>
+
+  <div class="mode-row" role="tablist" aria-label="Idea mode">
+    <span class="mono label">MODE →</span>
+    <button class="mode-pill active" data-mode="wild">🤪 Wild</button>
+    <button class="mode-pill" data-mode="b2b">💼 B2B</button>
+    <button class="mode-pill" data-mode="jugaad">🔧 Jugaad</button>
+    <button class="mode-pill" data-mode="cricket">🏏 Cricket</button>
+    <button class="mode-pill" data-mode="shaadi">💍 Shaadi</button>
+  </div>
+
+  <!-- ============ VIEW: SPIN ============ -->
+  <main id="view-spin" class="view active">
+    <div class="grid-2">
+      <section class="card slot-card">
+        <div class="card-head mono"><span>SLOT MACHINE • <b>SLOT-REEL SPIN</b></span><span class="pill">REROLLS LEFT: <b id="rerollsLeft">3</b></span></div>
+
+        <div class="slots">
+          <div class="slot" id="slotBuildWrap">
+            <div class="slot-label mono">📱 MAKE A [ PLATFORM ]</div>
+            <div class="slot-window"><div class="slot-text" id="slotBuild" aria-live="polite">📱 Mobile App</div></div>
+            <div class="slot-meta mono" id="slotBuildCat">APP • WEB • BOTH</div>
+            <button class="btn btn-small btn-lock" id="btnLockBuild">🔓 LOCK • pakka kar do <kbd>L</kbd></button>
+          </div>
+          <div class="slot-x">×</div>
+          <div class="slot" id="slotAudWrap">
+            <div class="slot-label mono">💡 WHAT TO BUILD + FOR WHOM</div>
+            <div class="slot-window green"><div class="slot-text" id="slotAud" aria-live="polite">Swiggy for leftover wedding food — for Shaadi wale mama ji</div></div>
+            <div class="slot-meta mono" id="slotAudCat">IDEA • AUDIENCE</div>
+            <button class="btn btn-small btn-lock" id="btnLockAud">🔓 LOCK • pakka kar do</button>
+          </div>
+        </div>
+
+        <div class="extra-chips">
+          <div class="chip mono" id="chipTwist">🌀 TWIST: —</div>
+          <div class="chip mono" id="chipMoney">💰 PAISE KAISE: —</div>
+        </div>
+
+        <div class="spin-actions">
+          <button id="btnSpin" class="btn btn-primary btn-big">🎰 SPIN KARO <kbd>space</kbd></button>
+          <button id="btnBuildGo" class="btn btn-dark btn-big">CHAL, BANA DE → <kbd>B</kbd></button>
+        </div>
+        <p class="hint mono">TIP: lock ek slot (L), dusra re-roll karo. Max 3 re-rolls — house rule! 🏠</p>
+      </section>
+
+      <section class="card wheel-card">
+        <div class="card-head mono"><span>DESI CHAKRA • <b>MELA WHEEL</b></span><span class="pill gold" id="wheelResultPill">THEME: —</span></div>
+        <div class="wheel-wrap">
+          <div class="pointer" aria-hidden="true">🔻</div>
+          <canvas id="wheel" width="420" height="420" aria-label="Desi theme wheel"></canvas>
+          <button id="btnWheel" class="btn btn-orange btn-wheel">🌀 CHAKRA GHUMAO <kbd>W</kbd></button>
+        </div>
+        <p class="hint mono" id="wheelHint">wheel theme idea pool ko bias karta hai. e.g. Cricket → IPL, Dhoni, umpire jokes</p>
+      </section>
+    </div>
+  </main>
+
+  <!-- ============ VIEW: BUILD ============ -->
+  <main id="view-build" class="view">
+    <div class="grid-2">
+      <section class="card">
+        <div class="card-head mono"><span>SPRINT • <b>5-MIN BUILD</b></span><span class="pill">CHAL, BANA DE 🔧</span></div>
+        <div class="combo-big"><span class="muted">Make a</span> <span id="buildComboX">📱 Mobile App</span><br><span class="muted">Idea:</span> <span id="buildComboY">—</span></div>
+        <div class="mono small" id="buildMeta">—</div>
+        <ul class="checklist">
+          <li><label><input type="checkbox" class="build-check"> Naam rakho (tapri-style, 3 sec mein yaad ho)</label></li>
+          <li><label><input type="checkbox" class="build-check"> Ek killer feature likho</label></li>
+          <li><label><input type="checkbox" class="build-check"> Paise kaise aayega? (mama ji commission?)</label></li>
+          <li><label><input type="checkbox" class="build-check"> Tagline: 6 words, full masala</label></li>
+        </ul>
+        <div class="row">
+          <button id="btnBuildStart" class="btn btn-primary">▶ START 5:00</button>
+          <button id="btnBuildPause" class="btn">⏸ PAUSE</button>
+          <button id="btnBuildReset" class="btn">↺ RESET</button>
+          <button id="btnToPitch" class="btn btn-dark">AB BOL, 60 SEC → <kbd>P</kbd></button>
+        </div>
+      </section>
+      <section class="card timer-card">
+        <div class="card-head mono"><span>TIMER RING</span><span class="pill" id="buildPct">100%</span></div>
+        <div class="ring-wrap">
+          <svg viewBox="0 0 140 140" class="ring">
+            <circle cx="70" cy="70" r="52" class="ring-bg"/>
+            <circle cx="70" cy="70" r="52" class="ring-fg" id="buildRing"/>
+            <text x="70" y="66" text-anchor="middle" class="ring-time" id="buildTime">5:00</text>
+            <text x="70" y="86" text-anchor="middle" class="ring-sub mono">BANA DE</text>
+          </svg>
+        </div>
+        <p class="hint mono">Timer khatam = auto pitch round. Background tab mein bhi accurate ⏱️</p>
+      </section>
+    </div>
+  </main>
+
+  <!-- ============ VIEW: PITCH ============ -->
+  <main id="view-pitch" class="view">
+    <div class="grid-2">
+      <section class="card">
+        <div class="card-head mono"><span>PITCH • <b>60 SECOND • AB BOL</b></span><span class="pill danger" id="pitchState">READY</span></div>
+        <div class="combo-big small-combo"><span class="muted">Make a</span> <span id="pitchComboX">—</span><br><span class="muted">Idea:</span> <span id="pitchComboY">—</span></div>
+        <div class="pitch-bar"><div class="pitch-fill" id="pitchFill"></div></div>
+        <div class="pitch-time mono"><span id="pitchTime">0:60</span><span>JANTA KA FAISLA 👇</span></div>
+        <div class="reactions" id="reactions">
+          <button class="react" data-r="🔥">🔥 pagal genius <b>0</b></button>
+          <button class="react" data-r="💰">💰 le le paisa <b>0</b></button>
+          <button class="react" data-r="😂">😂 hasa diya <b>0</b></button>
+          <button class="react" data-r="🤮">🤮 court mein milenge <b>0</b></button>
+        </div>
+        <div class="row">
+          <button id="btnPitchStart" class="btn btn-orange">🎤 PITCH MAAR • 60s</button>
+          <button id="btnPitchReset" class="btn">↺ RESET</button>
+          <button id="btnSave" class="btn btn-primary">💾 SAVE TO DECK</button>
+        </div>
+        <div class="row">
+          <button id="btnShare" class="btn">📤 SHARE / COPY</button>
+          <button id="btnCard" class="btn">🖼 REEL CARD (PNG)</button>
+          <button id="btnAgain" class="btn btn-dark">EK AUR BAAR ↺</button>
+        </div>
+      </section>
+      <section class="card">
+        <div class="card-head mono"><span>SAVED DECK • <b id="deckCount">0</b></span><button class="btn btn-small" id="btnClearDeck">CLEAR</button></div>
+        <div id="deck" class="deck"><p class="hint mono">Abhi khaali hai. Koi pitch save karo — yahin dikhega + localStorage mein save rahega.</p></div>
+      </section>
+    </div>
+  </main>
+
+  <section class="strip">
+    <div class="card mini">
+      <div class="card-head mono">🌟 COMMUNITY SPOTLIGHT</div>
+      <p id="spotlight"><b>"DRS for family arguments"</b> — 2.4k upvotes • Sharma ji special of the day 🏆</p>
+      <button class="btn btn-small" id="btnSpotlight">UPVOTE ⬆</button>
+    </div>
+    <div class="card mini">
+      <div class="card-head mono">📜 HOUSE RULES</div>
+      <ol class="rules">
+        <li>Max <b>3 re-rolls</b> per idea.</li>
+        <li>Build = <b>5 min</b>, Pitch = <b>60 sec</b>. No extra time, Sharma ji style.</li>
+        <li>Family-friendly roast only — situations, not people. 🙏</li>
+      </ol>
+    </div>
+    <div class="card mini">
+      <div class="card-head mono">⌨️ SHORTCUTS</div>
+      <p class="mono small">SPACE spin • L lock • W wheel • B build • P pitch • M mute</p>
+      <p class="mono small">Sound: WebAudio (no files needed) • Confetti: canvas-confetti 🎉</p>
+    </div>
+  </section>
+
+  <footer class="mono footer">JUGAAD ROULETTE v0.3 • static HTML+CSS+JS • design: Space Grotesk / hard-shadow desi arcade • <span id="year"></span></footer>
+</div>
+
+<div id="toast" class="toast mono" role="status"></div>
+<canvas id="shareCard" width="1080" height="1920" style="display:none"></canvas>
+
+<script src="app.js"></script>
+</body>
+</html>
